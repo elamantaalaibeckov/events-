@@ -7,11 +7,12 @@ export async function signInAction(formData: FormData) {
   const supabase = await createClient();
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
+  const next = String(formData.get("next") ?? "/dashboard");
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) redirect(`/auth/login?error=${encodeURIComponent(error.message)}`);
 
-  redirect("/dashboard");
+  redirect(next.startsWith("/") ? next : "/dashboard");
 }
 
 export async function signUpAction(formData: FormData) {
@@ -21,7 +22,7 @@ export async function signUpAction(formData: FormData) {
   const fullName = String(formData.get("full_name") ?? "");
   const groupName = String(formData.get("group_name") ?? "");
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -33,6 +34,8 @@ export async function signUpAction(formData: FormData) {
   });
 
   if (error) redirect(`/auth/register?error=${encodeURIComponent(error.message)}`);
+  if (!data.session) redirect("/auth/login?message=check-email");
+
   redirect("/dashboard");
 }
 

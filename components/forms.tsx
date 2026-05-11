@@ -3,9 +3,12 @@ import { signInAction, signUpAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function LoginForm() {
+export function LoginForm({ error, message, next }: { error?: string | null; message?: string | null; next?: string }) {
   return (
     <form action={signInAction} className="grid gap-4">
+      <input type="hidden" name="next" value={next || "/dashboard"} />
+      {error ? <p className="rounded-xl bg-red-50 p-3 text-sm font-medium text-red-700">{error}</p> : null}
+      {message ? <p className="rounded-xl bg-blue-50 p-3 text-sm font-medium text-blue-700">{message}</p> : null}
       <Input name="email" type="email" placeholder="Email" required />
       <Input name="password" type="password" placeholder="Пароль" required />
       <Button>Войти</Button>
